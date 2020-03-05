@@ -1,0 +1,83 @@
+import React, { useState } from "react";
+import { makeStyles } from "@material-ui/core/styles";
+import Paper from "@material-ui/core/Paper";
+import Typography from "@material-ui/core/Typography";
+import Chip from "@material-ui/core/Chip";
+//import Icon from "@material-ui/core/Icon";
+import Button from "@material-ui/core/Button";
+import TextField from "@material-ui/core/TextField";
+
+const useStyles = makeStyles(theme => ({
+  root: {
+    margin: "5%"
+  },
+  paperStyle: {
+    padding: theme.spacing(3, 2)
+  },
+  flex: {
+    display: "flex",
+    alignItems: "center"
+  },
+  chatWindow: {
+    width: "70%",
+    height: "400px",
+    padding: "20px"
+  },
+  friendsWindow: {
+    width: "30%",
+    height: "400px",
+    borderLeft: "1px solid grey"
+  },
+  chatBox: {
+    width: "85%"
+  },
+  button: {
+    width: "15%"
+  }
+}));
+
+export default function UserDashboard() {
+  const classes = useStyles();
+  const [textValue, changeTextValue] = useState();
+
+  return (
+    <div className={classes.root}>
+      <Paper className={classes.paperStyle}>
+        <Typography variant="h5" component="h3">
+          Chat Room
+        </Typography>
+        <Typography component="p">Topic place holder</Typography>
+        <div className={classes.flex}>
+          <div className={classes.chatWindow}>
+            {[{ from: "user", msg: "hello" }].map((chat, index) => (
+              <div className={classes.flex} key={index}>
+                <Chip label={chat.from} className={classes.chip} />
+                <Typography variant="p">{chat.msg} </Typography>
+              </div>
+            ))}
+          </div>
+          <div className={classes.friendsWindow}></div>
+        </div>
+        <div className={classes.flex}>
+          <TextField
+            label="Send a chat"
+            variant="outlined"
+            value={textValue}
+            className={classes.chatBox}
+            onChange={e => changeTextValue(e.target.value)}
+          />
+          <div className={classes.button}>
+            <Button
+              variant="contained"
+              color="primary"
+              className={classes.button}
+              // endIcon={<Icon>></Icon>}
+            >
+              Send
+            </Button>
+          </div>
+        </div>
+      </Paper>
+    </div>
+  );
+}
