@@ -7,6 +7,8 @@ import Chip from "@material-ui/core/Chip";
 import Button from "@material-ui/core/Button";
 import TextField from "@material-ui/core/TextField";
 
+import { CTX } from "./Store.js";
+
 const useStyles = makeStyles(theme => ({
   root: {
     margin: "5%"
@@ -39,6 +41,8 @@ const useStyles = makeStyles(theme => ({
 export default function UserDashboard() {
   const classes = useStyles();
   const [textValue, changeTextValue] = useState();
+  const [allChats] = React.useContext(CTX);
+  const [chat] = Object.values(allChats);
 
   return (
     <div className={classes.root}>
@@ -46,13 +50,15 @@ export default function UserDashboard() {
         <Typography variant="h5" component="h3">
           Chat Room
         </Typography>
-        <Typography component="p">Topic place holder</Typography>
+        {/* <Typography component="p">Topic place holder</Typography> */}
         <div className={classes.flex}>
           <div className={classes.chatWindow}>
-            {[{ from: "user", msg: "hello" }].map((chat, index) => (
+            {chat.map((chat, index) => (
               <div className={classes.flex} key={index}>
                 <Chip label={chat.from} className={classes.chip} />
-                <Typography variant="p">{chat.msg} </Typography>
+                <Typography variant="body1" gutterBottom>
+                  {chat.msg}{" "}
+                </Typography>
               </div>
             ))}
           </div>
