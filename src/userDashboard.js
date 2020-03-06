@@ -50,7 +50,6 @@ export default function UserDashboard() {
         <Typography variant="h5" component="h3">
           Chat Room
         </Typography>
-        {/* <Typography component="p">Topic place holder</Typography> */}
         <div className={classes.flex}>
           <div className={classes.chatWindow}>
             {chat.map((chat, index) => (

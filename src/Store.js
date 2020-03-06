@@ -27,8 +27,9 @@ function sendChatAction(value) {
   socket.emit("chat message", value);
 }
 
+const user = "Osa" + Math.random(100).toFixed(2);
+
 export default function Store(props) {
-  const user = "Osa" + Math.random(100).toFixed(2);
   const [allChats, dispatch] = React.useReducer(reducer, initialState);
 
   if (!socket) {
