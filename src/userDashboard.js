@@ -41,7 +41,7 @@ const useStyles = makeStyles(theme => ({
 export default function UserDashboard() {
   const classes = useStyles();
   const [textValue, changeTextValue] = useState();
-  const [allChats] = React.useContext(CTX);
+  const { allChats, sendChatAction, user } = React.useContext(CTX);
   const [chat] = Object.values(allChats);
 
   return (
@@ -71,12 +71,22 @@ export default function UserDashboard() {
             value={textValue}
             className={classes.chatBox}
             onChange={e => changeTextValue(e.target.value)}
+            onKeyPress={e => {
+              if (e.key === "Enter") {
+                sendChatAction({ from: user, msg: textValue });
+                changeTextValue("");
+              }
+            }}
           />
           <div className={classes.button}>
             <Button
               variant="contained"
               color="primary"
               className={classes.button}
+              onClick={() => {
+                sendChatAction({ from: user, msg: textValue });
+                changeTextValue("");
+              }}
               // endIcon={<Icon>></Icon>}
             >
               Send
