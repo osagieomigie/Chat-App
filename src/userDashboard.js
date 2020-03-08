@@ -3,7 +3,6 @@ import { makeStyles } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
 import Typography from "@material-ui/core/Typography";
 import Chip from "@material-ui/core/Chip";
-//import Icon from "@material-ui/core/Icon";
 import Button from "@material-ui/core/Button";
 import TextField from "@material-ui/core/TextField";
 import io from "socket.io-client";
@@ -20,6 +19,7 @@ const useStyles = makeStyles(theme => ({
   flex: {
     display: "flex",
     alignItems: "center"
+    //justifyContent: "space-between"
   },
   chatWindow: {
     width: "70%",
@@ -34,6 +34,12 @@ const useStyles = makeStyles(theme => ({
   },
   chatBox: {
     width: "85%"
+  },
+  sender: {
+    display: "flex",
+    letterSpacing: "0.2%",
+    alignItems: "center",
+    justifyContent: "flex-end"
   },
   button: {
     width: "15%"
@@ -114,7 +120,7 @@ export default function UserDashboard({ location }) {
           <div className={classes.chatWindow}>
             {messages.map((c, index) =>
               c.from === user ? (
-                <div className={classes.flex} key={index}>
+                <div className={classes.sender} key={index}>
                   <div> {c.time} </div>
                   <Chip
                     label={c.from}
@@ -181,7 +187,6 @@ export default function UserDashboard({ location }) {
               onClick={() => {
                 sendMessage(message);
               }}
-              // endIcon={<Icon>></Icon>}
             >
               Send
             </Button>
