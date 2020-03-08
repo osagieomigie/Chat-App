@@ -16,6 +16,10 @@ io.on("connection", function(socket) {
   socket.on("send Message", function(value) {
     console.log("message: " + value);
 
+    // send back timestamp
+    var d = new Date();
+    d = d.toLocaleTimeString();
+
     // if user sets their nick name.
     if (value.msg.includes("/nick")) {
       let givenName = value.from;
@@ -28,6 +32,7 @@ io.on("connection", function(socket) {
           value.from = user.nickName; // update user name to nick name
         }
       });
+      value.time = d;
       io.emit("chat message", value);
       chatHistory.push(value);
     }

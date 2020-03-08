@@ -91,6 +91,7 @@ export default function UserDashboard({ location }) {
           <div className={classes.chatWindow}>
             {messages.map((c, index) => (
               <div className={classes.flex} key={index}>
+                <div> {c.time} </div>
                 <Chip label={c.from} className={classes.chip} />
                 <Typography variant="body1" gutterBottom>
                   {c.msg}{" "}
