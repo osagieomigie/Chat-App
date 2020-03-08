@@ -3,15 +3,17 @@ var http = require("http").createServer(app);
 var io = require("socket.io")(http);
 
 let users = [];
+let chatHistory = [];
 //let userInfor = {};
 
 io.on("connection", function(socket) {
   console.log("a user connected");
 
   // when a user joins the group chat, the Group should be notified
-  io.emit("user connected");
+  io.emit("user connected", chatHistory);
+  console.log(JSON.stringify(chatHistory));
 
-  socket.on("chat message", function(value) {
+  socket.on("send Message", function(value) {
     console.log("message: " + value);
 
     // if user sets their nick name.
@@ -27,8 +29,13 @@ io.on("connection", function(socket) {
         }
       });
       io.emit("chat message", value);
+      chatHistory.push(value);
     }
   });
+
+  //   socket.on('disconnect', function(){
+
+  //   });
 });
 
 http.listen(3001, function() {
