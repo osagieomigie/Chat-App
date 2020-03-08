@@ -45,7 +45,7 @@ export default function UserDashboard({ location }) {
   const [user, setUser] = useState("");
   const tmpUser = `User-${Math.random(100).toFixed(2)}`;
   const [newUser, setNewUser] = useState(tmpUser);
-  const [users, setUsers] = useState("");
+  const [users, setUsers] = useState([]);
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
   const endpoint = ":3001";
@@ -55,6 +55,8 @@ export default function UserDashboard({ location }) {
     setNewUser(tmpUser);
     setUser(tmpUser);
 
+    socket.emit("userName", tmpUser);
+
     // for new users
     socket.on("user connected", function(data) {
       console.log(JSON.stringify(data));
@@ -63,15 +65,19 @@ export default function UserDashboard({ location }) {
         setMessages(messages => [...messages, element]);
       });
     });
+
+    socket.on("Update live users", function(data) {
+      console.log(JSON.stringify(data));
+      data.forEach(element => {
+        console.log(element);
+        setUsers([...users, element.nickName]);
+      });
+    });
   }, [newUser]);
 
   useEffect(() => {
-    socket.on("chat message", message => {
-      setMessages([...messages, message]);
-    });
-
-    socket.on("activeUsers", ({ users }) => {
-      setUsers(users);
+    socket.on("chat message", payload => {
+      setMessages([...messages, payload]);
     });
 
     return () => {
@@ -80,6 +86,30 @@ export default function UserDashboard({ location }) {
       socket.off();
     };
   }, [messages]);
+
+  let sendMessage = function(message) {
+    let tmp = [];
+    tmp = message.split(" ");
+    if (tmp[0] === "/nick") {
+      socket.emit("change nickName", { from: user, msg: message });
+    } else if (tmp[0] === "/nickcolor") {
+      socket.emit("change nick color", { from: user, msg: message });
+    } else {
+      socket.emit("send Message", { from: user, msg: message });
+    }
+
+    setMessage("");
+  };
+
+  // useEffect(() => {
+  //   socket.on("Update live users", function(data) {
+  //     console.log(JSON.stringify(data));
+  //     data.forEach(element => {
+  //       console.log(element);
+  //       setUsers(users => [...users, element.nickName]);
+  //     });
+  //   });
+  // }, [users]);
 
   return (
     <div className={classes.root}>
@@ -92,14 +122,26 @@ export default function UserDashboard({ location }) {
             {messages.map((c, index) => (
               <div className={classes.flex} key={index}>
                 <div> {c.time} </div>
-                <Chip label={c.from} className={classes.chip} />
+                <Chip
+                  label={c.from}
+                  className={classes.chip}
+                  style={{ color: c.color }}
+                />
                 <Typography variant="body1" gutterBottom>
                   {c.msg}{" "}
                 </Typography>
               </div>
             ))}
           </div>
-          <div className={classes.friendsWindow}></div>
+          <div className={classes.friendsWindow}>
+            {users.map((name, index) => (
+              <div className={classes.flex} key={index}>
+                <Typography variant="body1" gutterBottom>
+                  {name}{" "}
+                </Typography>
+              </div>
+            ))}
+          </div>
         </div>
         <div className={classes.flex}>
           <TextField
@@ -110,8 +152,7 @@ export default function UserDashboard({ location }) {
             onChange={e => setMessage(e.target.value)}
             onKeyPress={e => {
               if (e.key === "Enter") {
-                socket.emit("send Message", { from: user, msg: message });
-                setMessage("");
+                sendMessage(message);
               }
             }}
           />
@@ -121,8 +162,7 @@ export default function UserDashboard({ location }) {
               color="primary"
               className={classes.button}
               onClick={() => {
-                socket.emit("send Message", { from: user, msg: message });
-                setMessage("");
+                sendMessage(message);
               }}
               // endIcon={<Icon>></Icon>}
             >
