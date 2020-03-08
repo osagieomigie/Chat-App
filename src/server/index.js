@@ -26,18 +26,31 @@ io.on("connection", function(socket) {
   io.emit("user connected", chatHistory);
   console.log(JSON.stringify(chatHistory));
 
+  // reflect changes made
+  io.emit("Update live users", users);
+
   // if user sets their nick name.
   socket.on("change nickName", function(value) {
     let givenName = value.from;
     value.from = value.msg.substring(6);
-    users.forEach(user => {
-      if (user.userName === givenName) {
-        user.nickName = value.from;
-      }
-    });
+
+    // search to see if name is unique
+    const getNames = users.find(user => user.nickName === value.from);
+
+    // set name if unique
+    if (getNames == null) {
+      users.forEach(user => {
+        if (user.userName === givenName) {
+          user.nickName = value.from;
+        }
+      });
+    } // notify user about unability to change name
+
+    // reflect changes made
+    io.emit("Update live users", users);
   });
 
-  // if user changes their nick color.
+  // if user changes their nickname color.
   socket.on("change nick color", function(value) {
     value.msg = value.msg.substring(11);
     users.forEach(user => {
@@ -45,6 +58,9 @@ io.on("connection", function(socket) {
         user.color = value.msg;
       }
     });
+
+    // reflect changes made
+    io.emit("Update live users", users);
   });
 
   // when user sends a chat
@@ -58,8 +74,9 @@ io.on("connection", function(socket) {
     // verify user before emitting.
     users.forEach(user => {
       if (value.from === user.userName) {
-        value.from = user.nickName; // update user name to nick name
+        //value.from = user.nickName; // update user name to nick name
         value.color = user.color;
+        value.nickName = user.nickName;
       }
     });
     value.time = d;
@@ -74,9 +91,9 @@ io.on("connection", function(socket) {
     users.forEach((user, index) => {
       if (user.socketID === socket.id) {
         console.log(`${user.userName} left`);
-        //delete users[index];
-        //users.splice(index, 1);
-        user.status = "offline";
+        delete users[index];
+        users.splice(index, 1);
+        //user.status = "offline";
 
         // reflect user that left group chat
         io.emit("Update live users", users);

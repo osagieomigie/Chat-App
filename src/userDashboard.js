@@ -68,16 +68,19 @@ export default function UserDashboard({ location }) {
 
     socket.on("Update live users", function(data) {
       console.log(JSON.stringify(data));
-      data.forEach(element => {
-        console.log(element);
-        setUsers([...users, element.nickName]);
-      });
+      setUsers(data);
     });
+    // eslint-disable-next-line
   }, [newUser]);
 
   useEffect(() => {
     socket.on("chat message", payload => {
       setMessages([...messages, payload]);
+    });
+
+    socket.on("Update live users", function(data) {
+      console.log(JSON.stringify(data));
+      setUsers(data);
     });
 
     return () => {
@@ -101,16 +104,6 @@ export default function UserDashboard({ location }) {
     setMessage("");
   };
 
-  // useEffect(() => {
-  //   socket.on("Update live users", function(data) {
-  //     console.log(JSON.stringify(data));
-  //     data.forEach(element => {
-  //       console.log(element);
-  //       setUsers(users => [...users, element.nickName]);
-  //     });
-  //   });
-  // }, [users]);
-
   return (
     <div className={classes.root}>
       <Paper className={classes.paperStyle}>
@@ -119,28 +112,52 @@ export default function UserDashboard({ location }) {
         </Typography>
         <div className={classes.flex}>
           <div className={classes.chatWindow}>
-            {messages.map((c, index) => (
-              <div className={classes.flex} key={index}>
-                <div> {c.time} </div>
-                <Chip
-                  label={c.from}
-                  className={classes.chip}
-                  style={{ color: c.color }}
-                />
-                <Typography variant="body1" gutterBottom>
-                  {c.msg}{" "}
-                </Typography>
-              </div>
-            ))}
+            {messages.map((c, index) =>
+              c.from === user ? (
+                <div className={classes.flex} key={index}>
+                  <div> {c.time} </div>
+                  <Chip
+                    label={c.from}
+                    className={classes.chip}
+                    style={{ color: c.color, fontWeight: "bold" }}
+                  />
+                  <Typography
+                    variant="body1"
+                    gutterBottom
+                    style={{ fontWeight: "bold" }}
+                  >
+                    {c.msg}{" "}
+                  </Typography>
+                </div>
+              ) : (
+                <div className={classes.flex} key={index}>
+                  <div> {c.time} </div>
+                  <Chip
+                    label={c.from}
+                    className={classes.chip}
+                    style={{ color: c.color }}
+                  />
+                  <Typography variant="body1" gutterBottom>
+                    {c.msg}{" "}
+                  </Typography>
+                </div>
+              )
+            )}
           </div>
           <div className={classes.friendsWindow}>
-            {users.map((name, index) => (
-              <div className={classes.flex} key={index}>
-                <Typography variant="body1" gutterBottom>
-                  {name}{" "}
-                </Typography>
-              </div>
-            ))}
+            {users.map((name, index) =>
+              name.status === "online" ? (
+                <div className={classes.flex} key={index}>
+                  <Typography
+                    variant="body1"
+                    gutterBottom
+                    style={{ color: name.color }}
+                  >
+                    {name.nickName}{" "}
+                  </Typography>
+                </div>
+              ) : null
+            )}
           </div>
         </div>
         <div className={classes.flex}>
