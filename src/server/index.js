@@ -1,6 +1,8 @@
 var app = require("express")();
 var http = require("http").createServer(app);
 var io = require("socket.io")(http);
+var cookieParser = require("cookie-parser");
+app.use(cookieParser());
 
 let users = [];
 let chatHistory = [];

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
 import Typography from "@material-ui/core/Typography";
@@ -74,6 +74,15 @@ export default function UserDashboard({ location }) {
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
   const endpoint = ":3001";
+
+  const messagesEndRef = useRef(null);
+
+  // ensures chatbox is at the bottom, upon the arrive of a new message
+  const scrollToBottom = () => {
+    messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(scrollToBottom, [messages]);
 
   useEffect(() => {
     socket = io(endpoint);
@@ -200,6 +209,7 @@ export default function UserDashboard({ location }) {
                 </div>
               )
             )}
+            <div ref={messagesEndRef} />
           </div>
           <div className={classes.friendsWindow}>
             <Paper style={{ marginBottom: "1%" }}>
