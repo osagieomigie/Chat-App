@@ -44,7 +44,10 @@ io.on("connection", function(socket) {
           user.nickName = value.from;
         }
       });
-    } // notify user about unability to change name
+    } else {
+      // notify user about unability to change name
+      io.emit("nick name error", value.from);
+    }
 
     // reflect changes made
     io.emit("Update live users", users);

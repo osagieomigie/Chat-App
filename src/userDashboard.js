@@ -4,6 +4,8 @@ import Paper from "@material-ui/core/Paper";
 import Typography from "@material-ui/core/Typography";
 import Chip from "@material-ui/core/Chip";
 import Button from "@material-ui/core/Button";
+//import Icon from "@material-ui/core/Icon";
+//import FaceIcon from "@material-ui/core/Icon";
 import TextField from "@material-ui/core/TextField";
 import io from "socket.io-client";
 
@@ -14,7 +16,11 @@ const useStyles = makeStyles(theme => ({
     margin: "5%"
   },
   paperStyle: {
-    padding: theme.spacing(3, 2)
+    backgroundColor: "#E7F2F8",
+    padding: "5%"
+  },
+  header: {
+    padding: "1%"
   },
   flex: {
     display: "flex",
@@ -23,26 +29,37 @@ const useStyles = makeStyles(theme => ({
   },
   chatWindow: {
     width: "70%",
-    height: "400px",
-    padding: "20px",
+    height: "350px",
+    padding: "2%",
     overflow: "auto"
   },
   friendsWindow: {
     width: "30%",
-    height: "400px",
-    borderLeft: "1px solid grey"
+    height: "350px",
+    borderLeft: "1px solid grey",
+    alignItems: "center",
+    paddingLeft: "2%",
+    overflow: "auto"
   },
   chatBox: {
-    width: "85%"
+    width: "70%",
+    justifyContent: "flex-end"
   },
   sender: {
     display: "flex",
     letterSpacing: "0.2%",
     alignItems: "center",
-    justifyContent: "flex-end"
+    justifyContent: "flex-end",
+    verticalAlign: "bottom"
   },
   button: {
-    width: "15%"
+    margin: theme.spacing(1)
+    //width: "30%"
+    //alignItems: "center",
+    //paddingLeft: "1%"
+  },
+  chip: {
+    margin: "0.5%"
   }
 }));
 
@@ -96,11 +113,19 @@ export default function UserDashboard({ location }) {
     };
   }, [messages]);
 
+  // determine users option before emitting
   let sendMessage = function(message) {
     let tmp = [];
     tmp = message.split(" ");
     if (tmp[0] === "/nick") {
       socket.emit("change nickName", { from: user, msg: message });
+
+      // notify user about unability to change name
+      socket.on("nick name error", function(value) {
+        alert(
+          `Unable to set your nick name to ${value}, your name will remain the same :(`
+        );
+      });
     } else if (tmp[0] === "/nickcolor") {
       socket.emit("change nick color", { from: user, msg: message });
     } else {
@@ -113,44 +138,68 @@ export default function UserDashboard({ location }) {
   return (
     <div className={classes.root}>
       <Paper className={classes.paperStyle}>
-        <Typography variant="h5" component="h3">
-          Chat Room
+        <Typography variant="h5" component="h3" className={classes.header}>
+          Osa's Chat Room
+        </Typography>
+        <Typography variant="h6" component="h6">
+          You are: {user}
         </Typography>
         <div className={classes.flex}>
           <div className={classes.chatWindow}>
             {messages.map((c, index) =>
               c.from === user ? (
                 <div className={classes.sender} key={index}>
-                  <div> {c.time} </div>
                   <Chip
-                    label={c.from}
+                    label={c.msg}
                     className={classes.chip}
-                    style={{ color: c.color, fontWeight: "bold" }}
+                    variant="outlined"
+                    color="primary"
+                    //icon={<FaceIcon />}
+                    style={{
+                      color: c.color,
+                      fontWeight: "bold",
+                      padding: "1%",
+                      marginRight: "1%"
+                    }}
                   />
+
                   <Typography
                     variant="body1"
                     gutterBottom
-                    style={{ fontWeight: "bold" }}
+                    style={{ fontWeight: "bold", marginRight: "1%" }}
                   >
-                    {c.msg}{" "}
+                    {c.nickName}{" "}
+                  </Typography>
+
+                  <Typography variant="body1" gutterBottom>
+                    {c.time}{" "}
                   </Typography>
                 </div>
               ) : (
                 <div className={classes.flex} key={index}>
-                  <div> {c.time} </div>
-                  <Chip
-                    label={c.from}
-                    className={classes.chip}
-                    style={{ color: c.color }}
-                  />
-                  <Typography variant="body1" gutterBottom>
-                    {c.msg}{" "}
+                  <Typography
+                    variant="body1"
+                    gutterBottom
+                    style={{ marginRight: "1%" }}
+                  >
+                    {c.time}{" "}
                   </Typography>
+                  <Typography variant="body1" gutterBottom>
+                    {c.nickName}{" "}
+                  </Typography>
+                  <Chip
+                    label={c.msg}
+                    className={classes.chip}
+                    style={{ color: c.color, padding: "1%", marginLeft: "1%" }}
+                  />
                 </div>
               )
             )}
           </div>
           <div className={classes.friendsWindow}>
+            <Typography variant="h6" component="h6">
+              Active Users
+            </Typography>
             {users.map((name, index) =>
               name.status === "online" ? (
                 <div className={classes.flex} key={index}>
@@ -183,10 +232,12 @@ export default function UserDashboard({ location }) {
             <Button
               variant="contained"
               color="primary"
+              size="large"
               className={classes.button}
               onClick={() => {
                 sendMessage(message);
               }}
+              //endIcon={<Icon>send</Icon>}
             >
               Send
             </Button>
