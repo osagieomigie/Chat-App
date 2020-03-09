@@ -17,9 +17,11 @@ const useStyles = makeStyles(theme => ({
   },
   paperStyle: {
     backgroundColor: "#E7F2F8",
+
     padding: "5%"
   },
   header: {
+    borderBottom: "1px solid grey",
     padding: "1%"
   },
   flex: {
@@ -138,12 +140,15 @@ export default function UserDashboard({ location }) {
   return (
     <div className={classes.root}>
       <Paper className={classes.paperStyle}>
-        <Typography variant="h5" component="h3" className={classes.header}>
-          Osa's Chat Room
-        </Typography>
-        <Typography variant="h6" component="h6">
-          You are: {user}
-        </Typography>
+        <Paper>
+          <Typography variant="h5" component="h3" className={classes.header}>
+            Osa's Chat Room
+          </Typography>
+
+          <Typography variant="h6" component="h6">
+            You are: {user}
+          </Typography>
+        </Paper>
         <div className={classes.flex}>
           <div className={classes.chatWindow}>
             {messages.map((c, index) =>
@@ -172,7 +177,7 @@ export default function UserDashboard({ location }) {
                   </Typography>
 
                   <Typography variant="body1" gutterBottom>
-                    {c.time}{" "}
+                    [{c.time}]{" "}
                   </Typography>
                 </div>
               ) : (
@@ -182,7 +187,7 @@ export default function UserDashboard({ location }) {
                     gutterBottom
                     style={{ marginRight: "1%" }}
                   >
-                    {c.time}{" "}
+                    [{c.time}]{" "}
                   </Typography>
                   <Typography variant="body1" gutterBottom>
                     {c.nickName}{" "}
@@ -197,9 +202,11 @@ export default function UserDashboard({ location }) {
             )}
           </div>
           <div className={classes.friendsWindow}>
-            <Typography variant="h6" component="h6">
-              Active Users
-            </Typography>
+            <Paper style={{ marginBottom: "1%" }}>
+              <Typography variant="h6" component="h6">
+                Active Users
+              </Typography>
+            </Paper>
             {users.map((name, index) =>
               name.status === "online" ? (
                 <div className={classes.flex} key={index}>
