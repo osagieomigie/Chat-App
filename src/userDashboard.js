@@ -1,11 +1,10 @@
 import React, { useState, useEffect, useRef } from "react";
+//import { useCookies } from "react-cookie";
 import { makeStyles } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
 import Typography from "@material-ui/core/Typography";
 import Chip from "@material-ui/core/Chip";
 import Button from "@material-ui/core/Button";
-//import Icon from "@material-ui/core/Icon";
-//import FaceIcon from "@material-ui/core/Icon";
 import TextField from "@material-ui/core/TextField";
 import io from "socket.io-client";
 
@@ -27,7 +26,6 @@ const useStyles = makeStyles(theme => ({
   flex: {
     display: "flex",
     alignItems: "center"
-    //justifyContent: "space-between"
   },
   chatWindow: {
     width: "70%",
@@ -56,9 +54,6 @@ const useStyles = makeStyles(theme => ({
   },
   button: {
     margin: theme.spacing(1)
-    //width: "30%"
-    //alignItems: "center",
-    //paddingLeft: "1%"
   },
   chip: {
     margin: "0.5%"
@@ -73,6 +68,7 @@ export default function UserDashboard({ location }) {
   const [users, setUsers] = useState([]);
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
+  //const [cookies, setCookie] = useCookies(["name"]);
   const endpoint = ":3001";
 
   const messagesEndRef = useRef(null);
@@ -89,6 +85,7 @@ export default function UserDashboard({ location }) {
     setNewUser(tmpUser);
     setUser(tmpUser);
 
+    // emit user name and
     socket.emit("userName", tmpUser);
 
     // for new users
@@ -110,6 +107,7 @@ export default function UserDashboard({ location }) {
   useEffect(() => {
     socket.on("chat message", payload => {
       setMessages([...messages, payload]);
+      console.log(`message ${JSON.stringify(payload)}`);
     });
 
     socket.on("Update live users", function(data) {
@@ -129,7 +127,13 @@ export default function UserDashboard({ location }) {
     let tmp = [];
     tmp = message.split(" ");
     if (tmp[0] === "/nick") {
-      socket.emit("change nickName", { from: user, msg: message });
+      // error handling; prevents user from not entering name
+      if (tmp[1] !== " " && tmp[1] !== null) {
+        socket.emit("change nickName", {
+          from: user,
+          msg: message
+        });
+      }
 
       // notify user about unability to change name
       socket.on("nick name error", function(value) {
@@ -138,13 +142,26 @@ export default function UserDashboard({ location }) {
         );
       });
     } else if (tmp[0] === "/nickcolor") {
-      socket.emit("change nick color", { from: user, msg: message });
+      // error handling;
+      if (tmp[1] !== " " && tmp[1] !== null) {
+        socket.emit("change nick color", {
+          from: user,
+          msg: message
+        });
+      }
     } else {
-      socket.emit("send Message", { from: user, msg: message });
+      socket.emit("send Message", {
+        from: user,
+        msg: message
+      });
     }
 
     setMessage("");
   };
+
+  // let initCookie = function(newName) {
+  //   setCookie("name", newName, { path: "/" });
+  // };
 
   return (
     <div className={classes.root}>
@@ -168,9 +185,7 @@ export default function UserDashboard({ location }) {
                     className={classes.chip}
                     variant="outlined"
                     color="primary"
-                    //icon={<FaceIcon />}
                     style={{
-                      color: c.color,
                       fontWeight: "bold",
                       padding: "1%",
                       marginRight: "1%"
@@ -180,7 +195,11 @@ export default function UserDashboard({ location }) {
                   <Typography
                     variant="body1"
                     gutterBottom
-                    style={{ fontWeight: "bold", marginRight: "1%" }}
+                    style={{
+                      color: c.color,
+                      fontWeight: "bold",
+                      marginRight: "1%"
+                    }}
                   >
                     {c.nickName}{" "}
                   </Typography>
@@ -254,7 +273,6 @@ export default function UserDashboard({ location }) {
               onClick={() => {
                 sendMessage(message);
               }}
-              //endIcon={<Icon>send</Icon>}
             >
               Send
             </Button>

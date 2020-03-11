@@ -1,27 +1,37 @@
 var app = require("express")();
 var http = require("http").createServer(app);
 var io = require("socket.io")(http);
-var cookieParser = require("cookie-parser");
-app.use(cookieParser());
+//var cookieParser = require("cookie-parser");
+//app.use(cookieParser());
 
 let users = [];
 let chatHistory = [];
+let activeUsers = [];
 
 io.on("connection", function(socket) {
   // update online users
   socket.on("userName", function(value) {
     console.log(`A user connected ${value}`);
+
     users.push({
       userName: value,
       nickName: value,
       socketID: socket.id,
-      color: "#000000",
-      status: "online"
+      color: "#000000"
+    });
+
+    activeUsers.push({
+      userName: value,
+      nickName: value,
+      status: "online",
+      color: "#000000"
     });
 
     // reflect user that joined group
-    io.emit("Update live users", users);
-    console.log(users);
+    io.emit("Update live users", activeUsers); // send activeUsers
+
+    console.log(`users: ${JSON.stringify(users)}`);
+    console.log(`active users: ${JSON.stringify(activeUsers)}`);
   });
 
   // when a user joins the group chat, the Group should be notified. The user should also see previous messages
@@ -29,7 +39,7 @@ io.on("connection", function(socket) {
   console.log(JSON.stringify(chatHistory));
 
   // reflect changes made
-  io.emit("Update live users", users);
+  io.emit("Update live users", activeUsers); // send activeUsers
 
   // if user sets their nick name.
   socket.on("change nickName", function(value) {
@@ -44,6 +54,13 @@ io.on("connection", function(socket) {
       users.forEach(user => {
         if (user.userName === givenName) {
           user.nickName = value.from;
+          //user.cookie = value.cookie; // save info in a cookie
+
+          // update activeUsers
+          const getAUsers = activeUsers.find(
+            aUser => aUser.userName === givenName
+          );
+          getAUsers.nickName = value.from;
         }
       });
     } else {
@@ -52,7 +69,7 @@ io.on("connection", function(socket) {
     }
 
     // reflect changes made
-    io.emit("Update live users", users);
+    io.emit("Update live users", activeUsers); // send activeUsers
   });
 
   // if user changes their nickname color.
@@ -61,11 +78,16 @@ io.on("connection", function(socket) {
     users.forEach(user => {
       if (user.userName === value.from) {
         user.color = value.msg;
+        activeUsers.forEach(u => {
+          if (u.userName === user.userName) {
+            u.color = user.color;
+          }
+        });
       }
     });
 
     // reflect changes made
-    io.emit("Update live users", users);
+    io.emit("Update live users", activeUsers); // send activeUsers
   });
 
   // when user sends a chat
@@ -79,7 +101,6 @@ io.on("connection", function(socket) {
     // verify user before emitting.
     users.forEach(user => {
       if (value.from === user.userName) {
-        //value.from = user.nickName; // update user name to nick name
         value.color = user.color;
         value.nickName = user.nickName;
       }
@@ -96,12 +117,17 @@ io.on("connection", function(socket) {
     users.forEach((user, index) => {
       if (user.socketID === socket.id) {
         console.log(`${user.userName} left`);
-        delete users[index];
-        users.splice(index, 1);
-        //user.status = "offline";
+
+        // update activeUsers
+        activeUsers.forEach((u, i) => {
+          if (u.userName == user.userName) {
+            //delete activeUsers[i];
+            activeUsers.splice(i, 1);
+          }
+        });
 
         // reflect user that left group chat
-        io.emit("Update live users", users);
+        io.emit("Update live users", activeUsers);
         console.log(users);
       }
     });
