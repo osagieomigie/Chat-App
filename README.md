@@ -15,7 +15,7 @@
   > Change nick name by entering: /nick <new nickname>
   > Change nick name color by entering: /nickcolor <new color>
 
-> Makes use of React, Material UI, Web Sockets, and Nodejs 
+> Makes use of React, Material UI, Socket IO, and Nodejs 
 
 ## Install
 
