@@ -5,9 +5,9 @@
 
 ![alt text](./public/chatApp.png)
 
-## Description
+## What is Chat-App?
 
-Chat-App is a basic chatting application modelled after facebook's messenger.
+Chat-App is a basic chatting application modelled after discord.
 Makes use of React, Material UI, Web Sockets, and Nodejs
 
 ## Features
@@ -19,8 +19,8 @@ Makes use of React, Material UI, Web Sockets, and Nodejs
 
 ## Commands
 
-- Change nick name by entering: /nick <new nickname>
-- Change nick name color by entering: /nickcolor <new color>
+- Change nickname by entering: /nick <new nickname>
+- Change nickname color by entering: /nickcolor <new color>
 
 ## Install
 
