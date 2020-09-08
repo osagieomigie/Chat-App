@@ -22,6 +22,7 @@ Makes use of React, Material UI, Web Sockets, and Nodejs
 - Change nickname by entering: /nick <new nickname>
 - Change nickname color by entering: /nickcolor <new color>
 
+
 ## Install
 
 ```sh
